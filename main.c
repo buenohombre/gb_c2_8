@@ -1,40 +1,43 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "stdint.h"
-#include "string.h"
-#include "math.h"
+#include "main.h"
+#include "args.h"
+#include "homework.h"
+#include "test.h"
 
-typedef float (*function)(float);
-
-float test1(float x)
+static void PrintUsage()
 {
-    return x * x - 5;
-}
-
-float test2(float x)
-{
-    return x;
-}
-
-float FindRootChord(float xl, float xr, float eps, function f, function g)
-{
-    int stepCount = 0;
-    while (fabs(xl - xr) > eps)
-    {
-        xl = xl - (f(xl) - g(xl)) * (xr - xl) / ((f(xr) - g(xr)) - (f(xl) - g(xl)));
-        xr = xr - (f(xr) - g(xr)) * (xl - xr) / ((f(xl) - g(xl)) - (f(xr) - g(xr)));
-        stepCount++;
-    }
-    printf("found root for %d steps", stepCount);
-
-    return xl;
+    printf("Usage: \r\n");
+    printf("-h: help\r\n");
+    printf("-test: test square\r\n");
+    printf("-w do homework\r\n");
 }
 
 void main(int argc, char **argv)
 {
-    float xl = 0;
-    float xr = 5;
-    float eps = 0.001f;
+    ProgrammArg args[10];
+    int keyCount = ParseArgs(argc, argv, args, sizeof(args) / sizeof(*args));
+    if (keyCount < 1 || ContainKey(args, keyCount, "-h"))
+    {
+        PrintUsage();
+    }
+    else
+    {
+        while (1)
+        {
+            const ProgrammArg *arg = FindKey(args, keyCount, "-test");
+            if (arg != NULL)
+            {
+                TestSquare();
+                break;
+            }
+            arg = FindKey(args, keyCount, "-w");
+            if (arg != NULL)
+            {
+                Homework();
+                break;
+            }
 
-    printf(" -> Chord: %f\n", FindRootChord(xl, xr, eps, test1, test2));
+            PrintUsage();
+            break;
+        }
+    }
 }
